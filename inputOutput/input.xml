@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
+	<channel>
+		<title>Graser Export</title>
+		<description>Graser - Product - Feed.</description>
+		<item>
+			<g:id>4058855029628</g:id>
+			<g:title>Ajour</g:title>
+			<g:description><![CDATA[Der Feinsatin ist leicht und seidenähnlich. Der weiche Fall und der kostbare bleibende Glanz sind sein Markenzeichen. Er steht für den Einsatz langer hochwertiger Baumwollfasern und garantiert Langlebigkeit.
+
+Die Verarbeitung dieser besonders schönen Bettwäsche erfolgt bei den Deckenbezügen und den Kissenbezügen mit verdeckter Knopfleiste. Auf Wunsch auch mit Reißverschluss oder Hotelverschluss ohne Aufpreis.]]></g:description>
+			<g:condition>new</g:condition>
+			<g:availability>out of stock</g:availability>
+			<g:availabilityDate>Lieferzeit bitte anfragen</g:availabilityDate>
+			<g:price_ek>73.00 EUR</g:price_ek>
+			<g:price>186.00 EUR</g:price>
+			<g:gtin>4058855029628</g:gtin>
+			<g:mpn>2</g:mpn>
+			<g:shipping>
+				<g:country>DE</g:country>
+			</g:shipping>
+			<g:brand>Graser</g:brand>
+			<g:google_product_category>Bettwäsche</g:google_product_category>
+			<g:product_type>Bettwäsche</g:product_type>
+			<g:item_group_id>2</g:item_group_id>
+			<g:size>100/135</g:size>
+			<g:color>weiss</g:color>
+			<g:material>Mako Satin aus 100 % Baumwolle</g:material>
+			<g:link></g:link>
+			<g:image_link>https://www.graser-bettwaesche.de/deu/img/artikel/1200/Ajour.jpg</g:image_link>
+		</item>
+		
+	</channel>
+</rss>

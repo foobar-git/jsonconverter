@@ -6,20 +6,25 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
+
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAliasType;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import org.json.JSONObject;
 import org.json.XML;
-
 
 
 @SpringBootApplication
@@ -30,89 +35,123 @@ public class TestApplication {
 
 		String inputFile = "inputOutput/input.xml";
 		String outputFile = "inputOutput/output.json";
-		Boolean skipChannel = false;
+		Boolean humanReadable = true;
+		Boolean skipChannel = true;
+		String[] skipFields = {"color", "example_item_2", "etc..."};
 
-		testFn(inputFile, outputFile, skipChannel);
+		inputXMLoutputJSON(inputFile, outputFile, humanReadable, skipChannel, skipFields);
 	}
 
-	private static void testFn(String iFile, String oFile, Boolean b) {
+	private static Gson generateJSON(Boolean hr, String[] sf) {
+		GsonBuilder builder = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
+			@Override
+			public boolean shouldSkipField(FieldAttributes field) {
+				List<String> fieldNames = Arrays.asList(sf);
+				return fieldNames.contains(field.getName());
+			}
+			@Override
+			public boolean shouldSkipClass(Class<?> classSkip) {
+				return false; // do not skip any classes by default
+			}
+		});
+		if (hr) {
+			builder.setPrettyPrinting();
+		}
+		return builder.create();
+	}
+
+	private static void inputXMLoutputJSON(String iFile, String oFile, Boolean hr, Boolean sc, String[] sf) {
 		// Read the input XML file
+		System.out.println("Beginning to parse XML file...");
         String xmlString = null;
         try {
             xmlString = new String(Files.readAllBytes(Paths.get(iFile)));
         } catch (IOException e) {
+			System.out.println("Parsing of XML file aborted.");
             e.printStackTrace();
         }
 
-
-        // Create a new XStream instance and configure it to use annotations
+        // Parse the XML file into a string
         XStream xstream = new XStream();
-		xstream.allowTypesByWildcard(new String[] {"com.test.test.**"});	// TESTING
-		xstream.processAnnotations(XML_input.class);
+		xstream.allowTypes(new Class[] { XML_input.class });
+        xstream.processAnnotations(XML_input.class);
 
-        // Convert the XML string into an Item object
+        // Convert the XML string into Java object
+		System.out.println("Converting XML input...");
         XML_input xmlInput = (XML_input) xstream.fromXML(xmlString);
-        Item item_p = xmlInput.channel.item;
 
-		// Price
-		item_p.price = new Price();
-		item_p.price.value = item_p.price_.replace("EUR", "").trim();
-		item_p.price.currency = "EUR";
+		// Manipulate the Java object
+        for (Item item_p : xmlInput.channel.items) {
 
-		// Specifications
-		Specification specification = new Specification();
-		specification.type = "color";
-		specification.value = item_p.color;
-		item_p.specifications = new ArrayList<Specification>();
-		item_p.specifications.add(specification);
+			// Price
+			if (item_p.price_ != null) {
+				item_p.price = new Price();
+				item_p.price.value = item_p.price_.replace("EUR", "").trim();
+				item_p.price.currency = "EUR";
+			}
 
-		// Physical Measurements
-		PhysicalMeasurements physicalMasurement = new PhysicalMeasurements();
-		physicalMasurement.type = "length";
-		physicalMasurement.value = item_p.size;
-		physicalMasurement.unit = "not specified";
-		item_p.physicalMeasurements = new ArrayList<PhysicalMeasurements>();
-		item_p.physicalMeasurements.add(physicalMasurement);
+			// Specifications
+			Specification specification = new Specification();
+			specification.type = "color";
+			specification.value = item_p.color;
+			item_p.specifications = new ArrayList<Specification>();
+			item_p.specifications.add(specification);
 
-		// Images
-		item_p.images = new ArrayList<>();
-		item_p.images.add(item_p.image_link);
+			// Physical Measurements
+			PhysicalMeasurements physicalMasurement = new PhysicalMeasurements();
+			physicalMasurement.type = "length";
+			physicalMasurement.value = item_p.size;
+			physicalMasurement.unit = "not specified (we can assume: m)";
+			item_p.physicalMeasurements = new ArrayList<PhysicalMeasurements>();
+			item_p.physicalMeasurements.add(physicalMasurement);
 
-		// Category
-		item_p.categories = new ArrayList<>();
-		item_p.categories.add(item_p.google_product_category);
-		
-		// Markets
-		item_p.markets = new ArrayList<>();
-		item_p.markets.add(item_p.shipping.country);
+			// Images
+			item_p.images = new ArrayList<>();
+			item_p.images.add(item_p.image_link);
 
-		// Documentation
-		item_p.documentation = new ArrayList<>();
-		item_p.documentation.add(item_p.manual);
+			// Category
+			item_p.categories = new ArrayList<>();
+			item_p.categories.add(item_p.google_product_category);
+			
+			// Markets
+			item_p.markets = new ArrayList<>();
+			item_p.markets.add(item_p.shipping.country);
+
+			// Documentation
+			item_p.documentation = new ArrayList<>();
+			item_p.documentation.add(item_p.manual);
+		}
 
 
         // Create a new Gson instance
-        //Gson gson = new Gson();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		//Gson gson = new Gson();
+		Gson gson = generateJSON(hr, sf); // hr = humanReadable, sf = skipFields
 
-        // Convert the Item object into a JSON string
+        // Convert object into JSON string
+		System.out.println("Converting to JSON string...");
         String jsonOutput = gson.toJson(xmlInput);
-		if (b) {	// if skipChannel = true
-			JsonObject data = gson.fromJson(jsonOutput, JsonObject.class);
-			JsonObject itemData = data.getAsJsonObject("channel").getAsJsonObject("item");
-			jsonOutput = gson.toJson(itemData);
+		if (sc) {	// if skipChannel = true
+			JsonArray itemArray = new JsonArray();
+			for (Item item : xmlInput.channel.items) {
+				itemArray.add(gson.toJsonTree(item));
+			}
+			jsonOutput = gson.toJson(itemArray);
+		} else {
+			jsonOutput = gson.toJson(xmlInput);
 		}
 		
-        // Write the JSON string to the output file
+        // Write JSON string to output file
+		System.out.println("Saving to output file...");
         try (FileWriter fileWriter = new FileWriter(new File(oFile))) {
             fileWriter.write(jsonOutput);
-            System.out.println("Finished writing.");
+			System.out.println("Output file saved.");
         } catch (IOException e) {
+			System.out.println("Saving aborted.");
             e.printStackTrace();
         }
 	}
 
-	public static void parseXMLtoJSON(String iFile, String oFile) {
+	public static void simpleParseXMLtoJSON(String iFile, String oFile) {
 		// Read the input XML file
         String xmlString;
 		try {
@@ -133,17 +172,14 @@ public class TestApplication {
 	}
 }
 
-@XStreamAlias("rss")
+// Define the classes that represent the XML elements using XStream annotations
+@XStreamAliasType("rss")
 class XML_input {
     @XStreamAlias("channel")
     public Channel channel;
-
-	public Item getItem() {
-		return channel.item;
-	}
 }
 
-@XStreamAlias("channel")
+@XStreamAliasType("channel")
 class Channel {
 
     @XStreamAlias("title")
@@ -152,11 +188,11 @@ class Channel {
     @XStreamAlias("description")
     public String description;
     
-    @XStreamAlias("item")
-    public Item item;
+    @XStreamImplicit(itemFieldName="item")
+	public Item[] items;
 }
 
-@XStreamAlias("item")
+@XStreamAliasType("item")
 class Item {
 
 	@XStreamAlias("g:brand")
@@ -165,23 +201,32 @@ class Item {
 	@XStreamAlias("g:id")
     private String external_id;
 
-	@XStreamAlias("g:item_group_id")
-    private String item_group_id;
-
 	@XStreamAlias("g:title")
-    private String name;
+    public String name;
 
 	@XStreamAlias("g:description")
     private String description;
 
+	public List<String> categories;
+
+	public List<String> images;
+
+	public List<String> documentation;
+
+	public List<Specification> specifications;
+
+	public List<PhysicalMeasurements> physicalMeasurements;
+
+	public Price price;
+
+	@XStreamAlias("g:gtin")
+    
+	private String gtin;
+
+	public List<String> markets;
+
 	@XStreamAlias("g:manual")
     public String manual;
-	
-	@XStreamAlias("g:google_product_category")
-    public String google_product_category;
-
-	@XStreamAlias("g:product_type")
-    public String product_type;
 
 	@XStreamAlias("g:availability")
     private String availability;
@@ -195,13 +240,22 @@ class Item {
     @XStreamAlias("g:price_ek")
     public String price_ek;
 
-    @XStreamAlias("g:image_link")
-    public String image_link;
+	@XStreamAlias("g:mpn")
+    private String mpn;
 
-    @XStreamAlias("g:condition")
-    public String condition;
+	@XStreamAlias("g:shipping")
+    public Shipping shipping;
 
-    @XStreamAlias("g:size")
+	@XStreamAlias("g:google_product_category")
+    public String google_product_category;
+
+	@XStreamAlias("g:product_type")
+    public String product_type;
+
+	@XStreamAlias("g:item_group_id")
+    private String item_group_id;
+
+	@XStreamAlias("g:size")
     public String size;
 
     @XStreamAlias("g:color")
@@ -210,59 +264,19 @@ class Item {
     @XStreamAlias("g:material")
     public String material;
 
-	@XStreamAlias("g:gtin")
-    private String gtin;
-
-	@XStreamAlias("g:mpn")
-    private String mpn;
-
 	@XStreamAlias("g:link")
     private String link;
 
-	@XStreamAlias("g:shipping")
-    public Shipping shipping;
+    @XStreamAlias("g:image_link")
+    public String image_link;
 
-	public Price price;
+    @XStreamAlias("g:condition")
+    public String condition;
 
-	public List<String> markets;
-
-	public List<String> categories;
-
-	public List<String> images;
-
-	public List<String> documentation;
-
-	public List<Specification> specifications;
-
-	public List<PhysicalMeasurements> physicalMeasurements;
-
-    public Item (
-			String brand, String external_id, String item_group_id, String name, String description, String manual,
-			String google_product_category, String product_type, String availability, String availabilityDate,
-			String price_, String price_ek, String image_link, String gtin, String mpn, String link
-		) {
-		this.brand = brand;
-		this.external_id = external_id;
-		this.item_group_id = item_group_id;
-        this.name = name;
-        this.description = description;
-        this.manual = manual;
-        this.google_product_category = google_product_category;
-        this.product_type = product_type;
-        this.availability = availability;
-        this.availabilityDate = availabilityDate;
-        this.price_ = price_;
-        this.price_ek = price_ek;
-        this.image_link = image_link;
-        this.gtin = gtin;
-		this.mpn = mpn;
-		this.link = link;
-    }
-
-    // getters and setters ommited
+    // getters and setters omitted
 }
 
-@XStreamAlias("g:shipping")
+@XStreamAliasType("g:shipping")
 class Shipping {
     @XStreamAlias("g:country")
     public String country;

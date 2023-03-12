@@ -18,8 +18,6 @@ import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAliasType;
@@ -107,21 +105,6 @@ public class TestApplication {
 		return builder.create();
 	}
 
-	private static String formatJSON(Gson g, String json, Boolean hr) {
-		// remove the "[" and any whitespace characters
-		json = json.substring(1);
-		// remove the "]" at the end
-		json = json.substring(0, json.length() - 1);
-		if (hr) {
-			json = json.substring(1);
-			json = json.substring(0, json.length() - 1);
-			JsonElement jsonElement = JsonParser.parseString(json);
-			return g.toJson(jsonElement);
-		} else {
-			return json;
-		}
-	}
-
 	private static void inputXMLoutputJSON(String iFile, String oFile, Boolean hr, Boolean sc, String[] hf) {
 		// Read the input XML file
 		System.out.println("Beginning to parse XML file...");
@@ -201,10 +184,6 @@ public class TestApplication {
 		} else {
 			jsonOutput = gson.toJson(xmlInput);
 		}
-		
-		// remove reduntat charachters and spaces and
-		// format JSON for proper indentation
-		if (sc) jsonOutput = formatJSON(gson, jsonOutput, hr);
 		
         // Write JSON string to output file
 		System.out.println("Saving to output file...");

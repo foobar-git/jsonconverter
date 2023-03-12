@@ -45,9 +45,9 @@ public class TestApplication {
 		Boolean humanReadable = true;
 		Boolean skipChannel = true;
 		String[] hideFields = {
-		/*	"availability", "availabilityDate", "price_", "price_ek", "mpn", "shipping", 
+			"availability", "availabilityDate", "price_", "price_ek", "mpn", "shipping", 
 			"google_product_category", "product_type", "item_group_id", "size", "color", 
-			"material", "link", "image_link", "condition"*/
+			"material", "link", "image_link", "condition"
 		};
 
 		String[] namespaceInfo = getNamespaceInfo(inputFile);
@@ -148,8 +148,8 @@ public class TestApplication {
 			physicalMasurements.type = "length";
 			physicalMasurements.value = item_p.size;
 			physicalMasurements.unit = "not specified (we can assume: m)";
-			item_p.physicalMeasurements = new ArrayList<PhysicalMeasurement>();
-			item_p.physicalMeasurements.add(physicalMasurements);
+			item_p.physical_measurements = new ArrayList<PhysicalMeasurement>();
+			item_p.physical_measurements.add(physicalMasurements);
 
 			// Images
 			item_p.images = new ArrayList<>();
@@ -253,7 +253,7 @@ public class TestApplication {
 		public List<String> images;
 		public List<String> documentation;
 		public List<Specification> specifications;
-		public List<PhysicalMeasurement> physicalMeasurements;
+		public List<PhysicalMeasurement> physical_measurements;
 		public Price price;
 
 		@XStreamAlias("g:gtin")

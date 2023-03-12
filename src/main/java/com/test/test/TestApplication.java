@@ -38,37 +38,6 @@ import org.json.XML;
 @SpringBootApplication
 public class TestApplication {
 
-	static String[] tagName_newTagName_ItemClass = {
-		"brand", "brand",
-		"id", "external_id",
-		"title", "name",
-		"description", "description",
-		"gtin", "gtin",
-		"manual", "manual",
-		"availability", "availability",
-		"availabilityDate", "availabilityDate",
-		"price", "price_",
-		"price_ek", "price_ek",
-		"mpn", "mpn",
-		"shipping", "shipping",
-		"google_product_category", "google_product_category",
-		"product_type", "product_type",
-		"item_group_id", "item_group_id",
-		"size", "size",
-		"color", "color",
-		"material", "material",
-		"link", "link",
-		"image_link", "image_link",
-		"condition", "condition"
-	};
-
-	static String[] tagName_newTagName_ShippingClass = {
-		"country", "country"
-	};
-
-	static String namespacePrefix;
-	static String namespaceURI;
-
 	public static void main(String[] args) throws ParserConfigurationException, IOException, SAXException {
 		SpringApplication.run(TestApplication.class, args);
 
@@ -81,16 +50,17 @@ public class TestApplication {
 		};
 
 		String[] namespaceInfo = getNamespaceInfo(inputFile);
-		namespacePrefix = namespaceInfo[0];
-		namespaceURI = namespaceInfo[1];
-        System.out.println("XML file namespace prefix = " + namespacePrefix);
+		final String rssVersion = namespaceInfo[0];
+		final String namespacePrefix = namespaceInfo[1];
+		final String namespaceURI = namespaceInfo[2];
+        System.out.println("XML file rss version = " + rssVersion);
+		System.out.println("XML file namespace prefix = " + namespacePrefix);
         System.out.println("XML file namespace URI = " + namespaceURI);
 
 		inputXMLoutputJSON(inputFile, outputFile, humanReadable, skipChannel, skipFields);
 	}
 
 	public static String[] getNamespaceInfo(String iFile) throws ParserConfigurationException, IOException, SAXException {
-        // Create a new DocumentBuilder instance
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         DocumentBuilder db = dbf.newDocumentBuilder();
@@ -101,16 +71,15 @@ public class TestApplication {
         // Get the root element of the XML file
         Element rootElement = doc.getDocumentElement();
 
-       // Get all attributes of the root element
+       // Get attribute data
        NamedNodeMap attributes = rootElement.getAttributes();
-
-       String[] namespaceData = new String[2];
-
+	   String[] namespaceData = new String[3];
+	   namespaceData[0] = rootElement.getAttribute("version");
        for (int i = 0; i < attributes.getLength(); i++) {
             Node attribute = attributes.item(i);
 			if (attribute.getNodeName().startsWith("xmlns:")) {
-                namespaceData[0] = attribute.getNodeName().substring(6);
-				namespaceData[1] = attribute.getNodeValue();
+                namespaceData[1] = attribute.getNodeName().substring(6);
+				namespaceData[2] = attribute.getNodeValue();
 				break;
             }
        }
@@ -135,33 +104,6 @@ public class TestApplication {
 		return builder.create();
 	}
 
-	public static void addBrandAlias(XStream xs, Class<?> iClass, String fieldAlias, String newFieldAlias) {
-		String fieldAlias_ns = namespacePrefix + ":" + fieldAlias;
-		xs.aliasField(fieldAlias_ns, iClass, newFieldAlias);
-	}
-
-	public static String[][] createPairs(String[] input) {
-		String[][] pairs = new String[input.length / 2][2];
-		int index = 0;
-		for (int i = 0; i < input.length; i += 2) {
-			pairs[index][0] = input[i];
-			pairs[index][1] = input[i + 1];
-			index++;
-		}
-		return pairs;
-	}
-
-	public static void addBrandAliases(XStream xstream, Class<?> iClass, String[][] pairs) {
-		for (String[] pair : pairs) {
-			if (pair.length != 2) {
-				throw new IllegalArgumentException("Each entry must have exactly 2 elements");
-			}
-			String first = pair[0];
-			String second = pair[1];
-			addBrandAlias(xstream, iClass, first, second);
-		}
-	}
-
 	private static void inputXMLoutputJSON(String iFile, String oFile, Boolean hr, Boolean sc, String[] sf) {
 		// Read the input XML file
 		System.out.println("Beginning to parse XML file...");
@@ -173,14 +115,8 @@ public class TestApplication {
             e.printStackTrace();
         }
 
-        // Parse the XML file into a string
         XStream xstream = new XStream();
 		xstream.allowTypes(new Class[] { XML_input.class });
-		// Item.class
-		//addBrandAliases(xstream, Item.class, createPairs(tagName_newTagName_ItemClass));
-		// Shipping.class
-		//addBrandAliases(xstream, Shipping.class, createPairs(tagName_newTagName_ShippingClass));
-        //
 		xstream.processAnnotations(XML_input.class);
 		xstream.processAnnotations(Shipping.class);
 
@@ -188,8 +124,9 @@ public class TestApplication {
 		System.out.println("Converting XML input...");
         XML_input xmlInput = (XML_input) xstream.fromXML(xmlString);
 
-		// Manipulate the Java object
         for (Item item_p : xmlInput.channel.items) {
+
+			// Manipulating the data
 
 			// Price
 			if (item_p.price_ != null) {
@@ -206,12 +143,12 @@ public class TestApplication {
 			item_p.specifications.add(specification);
 
 			// Physical Measurements
-			PhysicalMeasurements physicalMasurement = new PhysicalMeasurements();
-			physicalMasurement.type = "length";
-			physicalMasurement.value = item_p.size;
-			physicalMasurement.unit = "not specified (we can assume: m)";
-			item_p.physicalMeasurements = new ArrayList<PhysicalMeasurements>();
-			item_p.physicalMeasurements.add(physicalMasurement);
+			PhysicalMeasurement physicalMasurements = new PhysicalMeasurement();
+			physicalMasurements.type = "length";
+			physicalMasurements.value = item_p.size;
+			physicalMasurements.unit = "not specified (we can assume: m)";
+			item_p.physicalMeasurements = new ArrayList<PhysicalMeasurement>();
+			item_p.physicalMeasurements.add(physicalMasurements);
 
 			// Images
 			item_p.images = new ArrayList<>();
@@ -301,9 +238,6 @@ class Channel {
 
 @XStreamAliasType("item")
 class Item {
-	// These values need to match with the second value (newTagName) in every pair
-	// in the array tagName_newTagName_ItemClass
-
 	@XStreamAlias("g:brand")
     private String brand;
 
@@ -320,7 +254,7 @@ class Item {
 	public List<String> images;
 	public List<String> documentation;
 	public List<Specification> specifications;
-	public List<PhysicalMeasurements> physicalMeasurements;
+	public List<PhysicalMeasurement> physicalMeasurements;
 	public Price price;
 
 	@XStreamAlias("g:gtin")
@@ -381,9 +315,6 @@ class Item {
 
 @XStreamAliasType("shipping")
 class Shipping {
-	// These values need to match with the second value (newTagName) in every pair
-	// in the array tagName_newTagName_ShippingClass
-
 	@XStreamAlias("g:country")
 	@XStreamImplicit(itemFieldName = "country")	// treat as dynamic collection (not fixed number of tags)
     List<String> country;
@@ -394,7 +325,7 @@ class Specification {
     String value;
 }
 
-class PhysicalMeasurements {
+class PhysicalMeasurement {
     String type;
     String value;
 	String unit;

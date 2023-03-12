@@ -25,7 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAliasType;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
-import org.springframework.boot.SpringApplication;
+//import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -40,7 +40,7 @@ import org.json.XML;
 public class TestApplication {
 
 	public static void main(String[] args) throws ParserConfigurationException, IOException, SAXException {
-		SpringApplication.run(TestApplication.class, args);
+		//SpringApplication.run(TestApplication.class, args);
 
 		String inputFile = "inputOutput/input.xml";
 		String outputFile = "inputOutput/output.json";
@@ -236,123 +236,123 @@ public class TestApplication {
 			e.printStackTrace();
 		}
 	}
-}
 
-// Define the classes that represent the XML elements using XStream annotations
-@XStreamAliasType("rss")
-class XML_input {
-    @XStreamAlias("channel")
-    public Channel channel;
-}
+	// Define the classes that represent the XML elements using XStream annotations
+	@XStreamAliasType("rss")
+	class XML_input {
+		@XStreamAlias("channel")
+		public Channel channel;
+	}
 
-@XStreamAliasType("channel")
-class Channel {
-    @XStreamAlias("title")
-    public String title;
-    
-    @XStreamAlias("description")
-    public String description;
-    
-    @XStreamImplicit(itemFieldName="item")
-	public Item[] items;
-}
+	@XStreamAliasType("channel")
+	class Channel {
+		@XStreamAlias("title")
+		public String title;
+		
+		@XStreamAlias("description")
+		public String description;
+		
+		@XStreamImplicit(itemFieldName="item")
+		public Item[] items;
+	}
 
-@XStreamAliasType("item")
-class Item {
-	@XStreamAlias("g:brand")
-    private String brand;
+	@XStreamAliasType("item")
+	class Item {
+		@XStreamAlias("g:brand")
+		private String brand;
 
-	@XStreamAlias("g:id")
-    private String external_id;
+		@XStreamAlias("g:id")
+		private String external_id;
 
-	@XStreamAlias("g:title")
-    public String name;
+		@XStreamAlias("g:title")
+		public String name;
 
-	@XStreamAlias("g:description")
-    private String description;
-	
-	public List<String> categories;
-	public List<String> images;
-	public List<String> documentation;
-	public List<Specification> specifications;
-	public List<PhysicalMeasurement> physicalMeasurements;
-	public Price price;
+		@XStreamAlias("g:description")
+		private String description;
+		
+		public List<String> categories;
+		public List<String> images;
+		public List<String> documentation;
+		public List<Specification> specifications;
+		public List<PhysicalMeasurement> physicalMeasurements;
+		public Price price;
 
-	@XStreamAlias("g:gtin")
-	private String gtin;
+		@XStreamAlias("g:gtin")
+		private String gtin;
 
-	public List<String> markets;
+		public List<String> markets;
 
-	@XStreamAlias("g:manual")
-    public String manual;
+		@XStreamAlias("g:manual")
+		public String manual;
 
-	@XStreamAlias("g:availability")
-    private String availability;
+		@XStreamAlias("g:availability")
+		private String availability;
 
-	@XStreamAlias("g:availabilityDate")
-    private String availabilityDate;
+		@XStreamAlias("g:availabilityDate")
+		private String availabilityDate;
 
-	@XStreamAlias("g:price")
-    public String price_;
+		@XStreamAlias("g:price")
+		public String price_;
 
-	@XStreamAlias("g:price_ek")
-    public String price_ek;
+		@XStreamAlias("g:price_ek")
+		public String price_ek;
 
-	@XStreamAlias("g:mpn")
-    private String mpn;
+		@XStreamAlias("g:mpn")
+		private String mpn;
 
-	@XStreamAlias("g:shipping")
-    public Shipping shipping;
-	
-	@XStreamAlias("g:google_product_category")
-    public String google_product_category;
+		@XStreamAlias("g:shipping")
+		public Shipping shipping;
+		
+		@XStreamAlias("g:google_product_category")
+		public String google_product_category;
 
-	@XStreamAlias("g:product_type")
-    public String product_type;
+		@XStreamAlias("g:product_type")
+		public String product_type;
 
-	@XStreamAlias("g:item_group_id")
-    private String item_group_id;
+		@XStreamAlias("g:item_group_id")
+		private String item_group_id;
 
-	@XStreamAlias("g:size")
-    public String size;
+		@XStreamAlias("g:size")
+		public String size;
 
-	@XStreamAlias("g:color")
-    public String color;
+		@XStreamAlias("g:color")
+		public String color;
 
-	@XStreamAlias("g:material")
-    public String material;
+		@XStreamAlias("g:material")
+		public String material;
 
-	@XStreamAlias("g:link")
-    private String link;
+		@XStreamAlias("g:link")
+		private String link;
 
-	@XStreamAlias("g:image_link")
-    public String image_link;
+		@XStreamAlias("g:image_link")
+		public String image_link;
 
-	@XStreamAlias("g:condition")
-    public String condition;
+		@XStreamAlias("g:condition")
+		public String condition;
 
-    // getters and setters omitted
-}
+		// getters and setters omitted
+	}
 
-@XStreamAliasType("shipping")
-class Shipping {
-	@XStreamAlias("g:country")
-	@XStreamImplicit(itemFieldName = "country")	// treat as dynamic collection (not fixed number of tags)
-    List<String> country;
-}
+	@XStreamAliasType("shipping")
+	class Shipping {
+		@XStreamAlias("g:country")
+		@XStreamImplicit(itemFieldName = "country")	// treat as dynamic collection (not fixed number of tags)
+		List<String> country;
+	}
 
-class Specification {
-    String type;
-    String value;
-}
+	static class Specification {
+		String type;
+		String value;
+	}
 
-class PhysicalMeasurement {
-    String type;
-    String value;
-	String unit;
-}
+	static class PhysicalMeasurement {
+		String type;
+		String value;
+		String unit;
+	}
 
-class Price {
-    String value;
-	String currency;
+	static class Price {
+		String value;
+		String currency;
+	}
 }

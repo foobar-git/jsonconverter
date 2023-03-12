@@ -32,7 +32,7 @@
     },
     "gtin": "4058855029628",
     "markets": [
-      "DE"
+      "DE, NO"
     ],
     "availability": "out of stock",
     "availabilityDate": "Lieferzeit bitte anfragen",
@@ -40,12 +40,13 @@
     "price_ek": "73.00 EUR",
     "mpn": "2",
     "shipping": {
-      "country": "DE"
+      "country": "DE, NO"
     },
     "google_product_category": "Bettwäsche",
     "product_type": "Bettwäsche",
     "item_group_id": "2",
     "size": "100/135",
+    "color": "weiss",
     "material": "Mako Satin aus 100 % Baumwolle",
     "link": "",
     "image_link": "https://www.graser-bettwaesche.de/deu/img/artikel/1200/Ajour.jpg",

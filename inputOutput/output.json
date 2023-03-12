@@ -32,7 +32,8 @@
     },
     "gtin": "4058855029628",
     "markets": [
-      "DE, NO"
+      "DE",
+      "NO"
     ],
     "availability": "out of stock",
     "availabilityDate": "Lieferzeit bitte anfragen",
@@ -40,7 +41,10 @@
     "price_ek": "73.00 EUR",
     "mpn": "2",
     "shipping": {
-      "country": "DE, NO"
+      "country": [
+        "DE",
+        "NO"
+      ]
     },
     "google_product_category": "Bettwäsche",
     "product_type": "Bettwäsche",

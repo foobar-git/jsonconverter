@@ -151,14 +151,14 @@ public class TestApplication {
 		return pairs;
 	}
 
-	public static void addBrandAliases(XStream xstream, Class<?> clazz, String[][] pairs) {
+	public static void addBrandAliases(XStream xstream, Class<?> iClass, String[][] pairs) {
 		for (String[] pair : pairs) {
 			if (pair.length != 2) {
 				throw new IllegalArgumentException("Each entry must have exactly 2 elements");
 			}
 			String first = pair[0];
 			String second = pair[1];
-			addBrandAlias(xstream, clazz, first, second);
+			addBrandAlias(xstream, iClass, first, second);
 		}
 	}
 
@@ -177,11 +177,12 @@ public class TestApplication {
         XStream xstream = new XStream();
 		xstream.allowTypes(new Class[] { XML_input.class });
 		// Item.class
-		addBrandAliases(xstream, Item.class, createPairs(tagName_newTagName_ItemClass));
+		//addBrandAliases(xstream, Item.class, createPairs(tagName_newTagName_ItemClass));
 		// Shipping.class
-		addBrandAliases(xstream, Shipping.class, createPairs(tagName_newTagName_ShippingClass));
+		//addBrandAliases(xstream, Shipping.class, createPairs(tagName_newTagName_ShippingClass));
         //
 		xstream.processAnnotations(XML_input.class);
+		xstream.processAnnotations(Shipping.class);
 
         // Convert the XML string into Java object
 		System.out.println("Converting XML input...");
@@ -222,7 +223,7 @@ public class TestApplication {
 			
 			// Markets
 			item_p.markets = new ArrayList<>();
-			item_p.markets.add(item_p.shipping.country);
+			item_p.markets.addAll(item_p.shipping.country);
 
 			// Documentation
 			item_p.documentation = new ArrayList<>();
@@ -298,53 +299,94 @@ class Channel {
 	public Item[] items;
 }
 
+@XStreamAliasType("item")
 class Item {
 	// These values need to match with the second value (newTagName) in every pair
 	// in the array tagName_newTagName_ItemClass
 
-	//@XStreamAlias("g:brand")
+	@XStreamAlias("g:brand")
     private String brand;
 
-	//@XStreamAlias("g:id")
+	@XStreamAlias("g:id")
     private String external_id;
 
-	//@XStreamAlias("g:title")
+	@XStreamAlias("g:title")
     public String name;
 
+	@XStreamAlias("g:description")
     private String description;
+	
 	public List<String> categories;
 	public List<String> images;
 	public List<String> documentation;
 	public List<Specification> specifications;
 	public List<PhysicalMeasurements> physicalMeasurements;
 	public Price price;
+
+	@XStreamAlias("g:gtin")
 	private String gtin;
+
 	public List<String> markets;
+
+	@XStreamAlias("g:manual")
     public String manual;
+
+	@XStreamAlias("g:availability")
     private String availability;
+
+	@XStreamAlias("g:availabilityDate")
     private String availabilityDate;
+
+	@XStreamAlias("g:price")
     public String price_;
+
+	@XStreamAlias("g:price_ek")
     public String price_ek;
+
+	@XStreamAlias("g:mpn")
     private String mpn;
+
+	@XStreamAlias("g:shipping")
     public Shipping shipping;
+	
+	@XStreamAlias("g:google_product_category")
     public String google_product_category;
+
+	@XStreamAlias("g:product_type")
     public String product_type;
+
+	@XStreamAlias("g:item_group_id")
     private String item_group_id;
+
+	@XStreamAlias("g:size")
     public String size;
+
+	@XStreamAlias("g:color")
     public String color;
+
+	@XStreamAlias("g:material")
     public String material;
+
+	@XStreamAlias("g:link")
     private String link;
+
+	@XStreamAlias("g:image_link")
     public String image_link;
+
+	@XStreamAlias("g:condition")
     public String condition;
 
     // getters and setters omitted
 }
 
+@XStreamAliasType("shipping")
 class Shipping {
 	// These values need to match with the second value (newTagName) in every pair
 	// in the array tagName_newTagName_ShippingClass
 
-    public String country;
+	@XStreamAlias("g:country")
+	@XStreamImplicit(itemFieldName = "country")	// treat as dynamic collection (not fixed number of tags)
+    List<String> country;
 }
 
 class Specification {

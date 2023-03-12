@@ -1,59 +1,57 @@
-[
-  {
-    "brand": "Graser",
-    "external_id": "4058855029628",
-    "name": "Ajour",
-    "description": "Der Feinsatin ist leicht und seidenähnlich. Der weiche Fall und der kostbare bleibende Glanz sind sein Markenzeichen. Er steht für den Einsatz langer hochwertiger Baumwollfasern und garantiert Langlebigkeit.\n\nDie Verarbeitung dieser besonders schönen Bettwäsche erfolgt bei den Deckenbezügen und den Kissenbezügen mit verdeckter Knopfleiste. Auf Wunsch auch mit Reißverschluss oder Hotelverschluss ohne Aufpreis.",
-    "categories": [
-      "Bettwäsche"
-    ],
-    "images": [
-      "https://www.graser-bettwaesche.de/deu/img/artikel/1200/Ajour.jpg"
-    ],
-    "documentation": [
-      null
-    ],
-    "specifications": [
-      {
-        "type": "color",
-        "value": "weiss"
-      }
-    ],
-    "physicalMeasurements": [
-      {
-        "type": "length",
-        "value": "100/135",
-        "unit": "not specified (we can assume: m)"
-      }
-    ],
-    "price": {
-      "value": "186.00",
-      "currency": "EUR"
-    },
-    "gtin": "4058855029628",
-    "markets": [
+{
+  "brand": "Graser",
+  "external_id": "4058855029628",
+  "name": "Ajour",
+  "description": "Der Feinsatin ist leicht und seidenähnlich. Der weiche Fall und der kostbare bleibende Glanz sind sein Markenzeichen. Er steht für den Einsatz langer hochwertiger Baumwollfasern und garantiert Langlebigkeit.\n\nDie Verarbeitung dieser besonders schönen Bettwäsche erfolgt bei den Deckenbezügen und den Kissenbezügen mit verdeckter Knopfleiste. Auf Wunsch auch mit Reißverschluss oder Hotelverschluss ohne Aufpreis.",
+  "categories": [
+    "Bettwäsche"
+  ],
+  "images": [
+    "https://www.graser-bettwaesche.de/deu/img/artikel/1200/Ajour.jpg"
+  ],
+  "documentation": [
+    null
+  ],
+  "specifications": [
+    {
+      "type": "color",
+      "value": "weiss"
+    }
+  ],
+  "physicalMeasurements": [
+    {
+      "type": "length",
+      "value": "100/135",
+      "unit": "not specified (we can assume: m)"
+    }
+  ],
+  "price": {
+    "value": "186.00",
+    "currency": "EUR"
+  },
+  "gtin": "4058855029628",
+  "markets": [
+    "DE",
+    "NO"
+  ],
+  "availability": "out of stock",
+  "availabilityDate": "Lieferzeit bitte anfragen",
+  "price_": "186.00 EUR",
+  "price_ek": "73.00 EUR",
+  "mpn": "2",
+  "shipping": {
+    "country": [
       "DE",
       "NO"
-    ],
-    "availability": "out of stock",
-    "availabilityDate": "Lieferzeit bitte anfragen",
-    "price_": "186.00 EUR",
-    "price_ek": "73.00 EUR",
-    "mpn": "2",
-    "shipping": {
-      "country": [
-        "DE",
-        "NO"
-      ]
-    },
-    "google_product_category": "Bettwäsche",
-    "product_type": "Bettwäsche",
-    "item_group_id": "2",
-    "size": "100/135",
-    "color": "weiss",
-    "material": "Mako Satin aus 100 % Baumwolle",
-    "link": "",
-    "image_link": "https://www.graser-bettwaesche.de/deu/img/artikel/1200/Ajour.jpg",
-    "condition": "new"
-  }
-]
+    ]
+  },
+  "google_product_category": "Bettwäsche",
+  "product_type": "Bettwäsche",
+  "item_group_id": "2",
+  "size": "100/135",
+  "color": "weiss",
+  "material": "Mako Satin aus 100 % Baumwolle",
+  "link": "",
+  "image_link": "https://www.graser-bettwaesche.de/deu/img/artikel/1200/Ajour.jpg",
+  "condition": "new"
+}

@@ -18,7 +18,8 @@ import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
-
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAliasType;
@@ -45,8 +46,10 @@ public class TestApplication {
 		String outputFile = "inputOutput/output.json";
 		Boolean humanReadable = true;
 		Boolean skipChannel = true;
-		String[] skipFields = {
-			"example_item_1", "example_item_2", "etc..."
+		String[] hideFields = {
+		/*	"availability", "availabilityDate", "price_", "price_ek", "mpn", "shipping", 
+			"google_product_category", "product_type", "item_group_id", "size", "color", 
+			"material", "link", "image_link", "condition"*/
 		};
 
 		String[] namespaceInfo = getNamespaceInfo(inputFile);
@@ -57,7 +60,7 @@ public class TestApplication {
 		System.out.println("XML file namespace prefix = " + namespacePrefix);
         System.out.println("XML file namespace URI = " + namespaceURI);
 
-		inputXMLoutputJSON(inputFile, outputFile, humanReadable, skipChannel, skipFields);
+		inputXMLoutputJSON(inputFile, outputFile, humanReadable, skipChannel, hideFields);
 	}
 
 	public static String[] getNamespaceInfo(String iFile) throws ParserConfigurationException, IOException, SAXException {
@@ -86,11 +89,11 @@ public class TestApplication {
        return namespaceData;
     }
 
-	private static Gson generateJSON(Boolean hr, String[] sf) {
+	private static Gson generateJSON(Boolean hr, String[] hf) {
 		GsonBuilder builder = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
 			@Override
 			public boolean shouldSkipField(FieldAttributes field) {
-				List<String> fieldNames = Arrays.asList(sf);
+				List<String> fieldNames = Arrays.asList(hf);
 				return fieldNames.contains(field.getName());
 			}
 			@Override
@@ -104,7 +107,22 @@ public class TestApplication {
 		return builder.create();
 	}
 
-	private static void inputXMLoutputJSON(String iFile, String oFile, Boolean hr, Boolean sc, String[] sf) {
+	private static String formatJSON(Gson g, String json, Boolean hr) {
+		// remove the "[" and any whitespace characters
+		json = json.substring(1);
+		// remove the "]" at the end
+		json = json.substring(0, json.length() - 1);
+		if (hr) {
+			json = json.substring(1);
+			json = json.substring(0, json.length() - 1);
+			JsonElement jsonElement = JsonParser.parseString(json);
+			return g.toJson(jsonElement);
+		} else {
+			return json;
+		}
+	}
+
+	private static void inputXMLoutputJSON(String iFile, String oFile, Boolean hr, Boolean sc, String[] hf) {
 		// Read the input XML file
 		System.out.println("Beginning to parse XML file...");
         String xmlString = null;
@@ -159,20 +177,19 @@ public class TestApplication {
 			item_p.categories.add(item_p.google_product_category);
 			
 			// Markets
-			item_p.markets = new ArrayList<>();
-			item_p.markets.addAll(item_p.shipping.country);
+			if (item_p.shipping != null) {
+				item_p.markets = new ArrayList<>();
+				item_p.markets.addAll(item_p.shipping.country);
+			}
 
 			// Documentation
 			item_p.documentation = new ArrayList<>();
 			item_p.documentation.add(item_p.manual);
 		}
 
-
-        // Create a new Gson instance
-		//Gson gson = new Gson();
-		Gson gson = generateJSON(hr, sf); // hr = humanReadable, sf = skipFields
-
         // Convert object into JSON string
+		Gson gson = generateJSON(hr, hf); // hr = humanReadable, hf = hideFields
+
 		System.out.println("Converting to JSON string...");
         String jsonOutput = gson.toJson(xmlInput);
 		if (sc) {	// if skipChannel = true
@@ -184,6 +201,10 @@ public class TestApplication {
 		} else {
 			jsonOutput = gson.toJson(xmlInput);
 		}
+		
+		// remove reduntat charachters and spaces and
+		// format JSON for proper indentation
+		if (sc) jsonOutput = formatJSON(gson, jsonOutput, hr);
 		
         // Write JSON string to output file
 		System.out.println("Saving to output file...");
